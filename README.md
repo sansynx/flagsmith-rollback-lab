@@ -2,7 +2,7 @@
 
 What happens to the shopper who already has express checkout open when you turn its flag off? Rollback Rehearsal lets you press Pay and see the result. Built for **Toggle Wars, Track 03 · Build on Open Source Flagsmith**.
 
-[Watch the 92-second submission video](https://flagsmith-rollback-lab.vercel.app/watch) · [Open the hosted demo](https://flagsmith-rollback-lab.vercel.app/presenter) · [Explore the rehearsal lab](https://flagsmith-rollback-lab.vercel.app/)
+[Watch the submission video on YouTube](https://youtu.be/_Q_UA8obmvI) · [Open the hosted demo](https://flagsmith-rollback-lab.vercel.app/presenter) · [Explore the rehearsal lab](https://flagsmith-rollback-lab.vercel.app/)
 
 Vercel serves the frontend. The hosted API reaches the self-hosted Flagsmith sandbox through a Cloudflare tunnel. The local setup below runs independently.
 
