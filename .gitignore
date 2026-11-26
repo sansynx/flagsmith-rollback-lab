@@ -37,3 +37,6 @@ node_modules/
 test-results/
 playwright-report/
 !live-demo/index.html
+
+# Vercel local project and pulled credentials
+.vercel/
