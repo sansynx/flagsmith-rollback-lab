@@ -1,0 +1,39 @@
+# Local-only files and credentials
+behind.local/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python environment and build output
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Generated reports and the separate explainer
+reports/
+*.html
+flagsmith-rehearsal-explainer/
+
+# Dashboard development
+node_modules/
+
+# Editor settings, local credentials and generated demo media
+.vscode/
+.idea/
+.DS_Store
+.runtime/
+*.log
+*.tsbuildinfo
+*.mp3
+*.mp4
+*.webm
+test-results/
+playwright-report/
+!live-demo/index.html

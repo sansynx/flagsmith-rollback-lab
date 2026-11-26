@@ -1,0 +1,50 @@
+[
+  {
+    "id": "checkout", "title": "Checkout", "flag": "checkout_v2",
+    "description": "A customer leaves the redesigned checkout open with a pending payment.",
+    "open": "Open checkout", "fresh": "Open fresh checkout", "finish": "Submit original checkout", "retire": "Retire v2 handler",
+    "resource": "payment handler", "method": "POST", "path": "/checkout/pay", "artifact": "payment_intent_v2",
+    "failureStatus": 410, "failure": "The v2 payment handler was retired",
+    "successStatus": 201, "success": "Synthetic payment accepted"
+  },
+  {
+    "id": "upload", "title": "Resumable upload", "flag": "resumable_upload_v2",
+    "description": "A file is partially uploaded when the resumable upload feature rolls back.",
+    "open": "Start upload", "fresh": "Start fresh upload", "finish": "Finish original upload", "retire": "Retire chunk assembler",
+    "resource": "chunk assembler", "method": "PUT", "path": "/uploads/complete", "artifact": "chunk_manifest_v2",
+    "failureStatus": 409, "failure": "The legacy assembler rejects the v2 chunk manifest",
+    "successStatus": 200, "success": "All upload chunks assembled"
+  },
+  {
+    "id": "booking", "title": "Booking hold", "flag": "booking_hold_v2",
+    "description": "A visitor holds a reservation while the booking flow changes.",
+    "open": "Hold a reservation", "fresh": "Open fresh booking", "finish": "Confirm original reservation", "retire": "Retire hold resolver",
+    "resource": "hold resolver", "method": "POST", "path": "/booking/confirm", "artifact": "reservation_hold_v2",
+    "failureStatus": 409, "failure": "The held reservation cannot be resolved by the legacy flow",
+    "successStatus": 201, "success": "Held reservation confirmed"
+  },
+  {
+    "id": "export", "title": "Report export", "flag": "report_export_v2",
+    "description": "A queued report finishes after downloads switch back to the legacy renderer.",
+    "open": "Queue report", "fresh": "Queue fresh report", "finish": "Download original report", "retire": "Retire v2 renderer",
+    "resource": "report renderer", "method": "GET", "path": "/exports/download", "artifact": "render_ticket_v2",
+    "failureStatus": 404, "failure": "The queued v2 report no longer has a download handler",
+    "successStatus": 200, "success": "Queued report downloaded"
+  },
+  {
+    "id": "onboarding", "title": "Onboarding draft", "flag": "onboarding_draft_v2",
+    "description": "An applicant saves a v2 draft just before the form returns to its old schema.",
+    "open": "Save draft", "fresh": "Start fresh draft", "finish": "Submit original draft", "retire": "Retire draft validator",
+    "resource": "draft validator", "method": "POST", "path": "/onboarding/submit", "artifact": "draft_schema_v2",
+    "failureStatus": 422, "failure": "The v2 draft does not match the legacy schema",
+    "successStatus": 200, "success": "Saved draft submitted"
+  },
+  {
+    "id": "quote", "title": "Subscription quote", "flag": "subscription_quote_v2",
+    "description": "A customer confirms a price quote they received before the pricing feature was disabled.",
+    "open": "Lock price quote", "fresh": "Request fresh quote", "finish": "Accept original quote", "retire": "Retire quote verifier",
+    "resource": "quote verifier", "method": "PATCH", "path": "/subscription/accept", "artifact": "signed_quote_v2",
+    "failureStatus": 412, "failure": "The legacy verifier cannot validate the v2 quote",
+    "successStatus": 202, "success": "Quoted subscription accepted"
+  }
+]

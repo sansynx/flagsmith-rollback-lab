@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15.5-alpine
+    environment:
+      POSTGRES_PASSWORD: ${ROLLBACK_DB_PASSWORD:?Run make setup}
+      POSTGRES_DB: flagsmith
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -d flagsmith -U postgres"]
+      interval: 2s
+      retries: 20
+  flagsmith:
+    image: docker.flagsmith.com/flagsmith/flagsmith:2.292.0
+    environment:
+      DATABASE_URL: postgresql://postgres:${ROLLBACK_DB_PASSWORD}@db:5432/flagsmith
+      DJANGO_SECRET_KEY: ${ROLLBACK_DB_PASSWORD}
+      FLAGSMITH_DOMAIN: localhost
+      DJANGO_ALLOWED_HOSTS: "127.0.0.1,localhost"
+      USE_POSTGRES_FOR_ANALYTICS: "true"
+      CACHE_ENVIRONMENT_DOCUMENT_SECONDS: "0"
+      CACHE_ENVIRONMENT_SEGMENTS_SECONDS: "0"
+    ports:
+      - "127.0.0.1::8000"
+    healthcheck:
+      test: [CMD, flagsmith, healthcheck, tcp]
+      start_period: 60s
+      interval: 4s
+      timeout: 4s
+      retries: 15
+    depends_on:
+      db:
+        condition: service_healthy

@@ -1,0 +1,37 @@
+{
+  "edits": [
+    {
+      "segment": "Paid US customers",
+      "rule_path": [0, 0],
+      "segment_sha256": "c82069541d7374965df1b00337ada5e2d8122bd6069409d361924a82db29d68d",
+      "from": "ALL",
+      "to": "ANY"
+    }
+  ],
+  "cases": [
+    {
+      "name": "Paid US customer",
+      "identifier": "test-paid-us",
+      "traits": {"plan": "paid", "country": "US"},
+      "expect": {"new_checkout": {"enabled": true, "value": "redesigned"}}
+    },
+    {
+      "name": "Free US customer",
+      "identifier": "test-free-us",
+      "traits": {"plan": "free", "country": "US"},
+      "expect": {"new_checkout": {"enabled": false}}
+    },
+    {
+      "name": "Paid Canadian customer",
+      "identifier": "test-paid-ca",
+      "traits": {"plan": "paid", "country": "CA"},
+      "expect": {"new_checkout": {"enabled": false}}
+    },
+    {
+      "name": "Free Canadian customer",
+      "identifier": "test-free-ca",
+      "traits": {"plan": "free", "country": "CA"},
+      "expect": {"new_checkout": {"enabled": false, "value": null}}
+    }
+  ]
+}

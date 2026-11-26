@@ -1,0 +1,67 @@
+@import "tailwindcss" source(none);
+@source "./";
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme inline {
+  --color-background: #f3f1e9;
+  --color-foreground: #272a24;
+  --color-card: #faf9f4;
+  --color-card-foreground: #272a24;
+  --color-muted: #efede4;
+  --color-muted-foreground: #57594e;
+  --color-border: #d7d2c3;
+  --color-input: #b9b4a6;
+  --color-primary: #9c431d;
+  --color-primary-foreground: #fff9f1;
+  --color-accent: #f0e7d8;
+  --color-accent-foreground: #713617;
+  --color-secondary: #eae6da;
+  --color-secondary-foreground: #34372e;
+  --color-destructive: #992e28;
+  --color-ring: #9c431d;
+  --color-chart: #212722;
+  --color-chart-text: #f7f4e9;
+  --color-chart-muted: #c7cabe;
+  --color-chart-rule: #535c52;
+  --color-chart-pass: #9bba8b;
+  --color-chart-fail: #ea906e;
+  --color-chart-block: #e2c476;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background font-sans text-foreground antialiased; }
+  button:not(:disabled) { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--color-ring); outline-offset: 3px; }
+  .chart-run:focus-visible { outline-color: var(--color-chart-block); }
+}
+
+.tone-passed { color: #354e2c; background: #e4ecd9; }
+.tone-failed { color: #8d3023; background: #f8e5dc; }
+.tone-blocked { color: #67501d; background: #f4ebd1; }
+.fill-passed { background: #5e754e; }
+.fill-failed { background: #bd4c31; }
+.fill-blocked { background: #977528; }
+
+@layer components {
+  .chart-run[aria-pressed="true"] { background: #414c42; }
+  .chart-run:hover { background: #384238; }
+  .chart-fail {
+    background: repeating-linear-gradient(135deg, var(--color-chart-fail) 0 5px, #BD6144 5px 7px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
+}

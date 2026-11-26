@@ -1,0 +1,55 @@
+{
+  "id": 1,
+  "api_key": "demo-environment",
+  "name": "Local demo",
+  "updated_at": "2026-11-19T00:00:00Z",
+  "identity_overrides": [],
+  "project": {
+    "id": 1,
+    "name": "Checkout demo",
+    "hide_disabled_flags": false,
+    "organisation": {"id": 1, "name": "Demo"},
+    "segments": [
+      {
+        "id": 2,
+        "name": "Paid US customers",
+        "rules": [
+          {
+            "type": "ALL",
+            "conditions": [],
+            "rules": [
+              {
+                "type": "ALL",
+                "conditions": [
+                  {"property_": "plan", "operator": "EQUAL", "value": "paid"},
+                  {"property_": "country", "operator": "EQUAL", "value": "US"}
+                ],
+                "rules": []
+              }
+            ]
+          }
+        ],
+        "feature_states": [
+          {
+            "django_id": 12,
+            "feature": {"id": 4, "name": "new_checkout", "type": "STANDARD"},
+            "enabled": true,
+            "feature_state_value": "redesigned",
+            "feature_segment": {"priority": 0},
+            "multivariate_feature_state_values": []
+          }
+        ]
+      }
+    ]
+  },
+  "feature_states": [
+    {
+      "django_id": 11,
+      "feature": {"id": 4, "name": "new_checkout", "type": "STANDARD"},
+      "enabled": false,
+      "feature_state_value": null,
+      "feature_segment": null,
+      "multivariate_feature_state_values": []
+    }
+  ]
+}

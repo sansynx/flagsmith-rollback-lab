@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flagsmith-rollout-rehearsal"
+version = "0.3.0"
+description = "Rehearse Flagsmith targeting changes against saved personas."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "flagsmith==6.3.0",
+    "flagsmith-flag-engine==11.1.2",
+    "requests>=2.32.3,<3",
+]
+
+[project.scripts]
+flagsmith-rehearsal = "rollout_rehearsal.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["rollout_rehearsal"]
+
+[tool.setuptools.package-data]
+rollout_rehearsal = ["dashboard_assets/*.css", "dashboard_assets/*.js", "dashboard_assets/*.md"]
