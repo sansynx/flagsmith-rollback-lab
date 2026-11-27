@@ -67,5 +67,9 @@ export function Presenter() {
       </CardContent></Card>
     {state && <Card><CardHeader><CardTitle><h2>Shop activity</h2></CardTitle></CardHeader><CardContent><dl className="grid grid-cols-3 gap-2">{[["Open",state.open],["Paid",state.paid],["Failed",state.failed]].map(([label,value])=><div key={label}><dt className="text-sm text-muted-foreground">{label}</dt><dd className="font-mono text-2xl">{value}</dd></div>)}</dl></CardContent></Card>}
     {(error || live.error) && <Alert><AlertDescription>{error || live.error}</AlertDescription><Button variant="outline" onClick={connect}>Reconnect presenter</Button></Alert>}
+    <nav aria-label="Project resources" className="flex flex-wrap gap-2 border-t pt-4">
+      <Button asChild variant="outline"><a href="https://github.com/sansynx/flagsmith-rollback-lab" target="_blank" rel="noopener noreferrer">Source on GitHub <IconExternalLink /></a></Button>
+      <Button asChild variant="outline"><a href="https://github.com/Flagsmith/flagsmith-cli/pull/120" target="_blank" rel="noopener noreferrer">Flagsmith CLI pull request <IconExternalLink /></a></Button>
+    </nav>
   </main>
 }

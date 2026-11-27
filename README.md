@@ -2,7 +2,7 @@
 
 A shopper opens express checkout. You turn its feature flag off, and new shoppers go back to standard checkout. The shopper who already has a payment open still needs the express handler. When can you safely retire it?
 
-Rollback Rehearsal lets you try both orders against self-hosted Flagsmith and see what happens to the same pending payment. The lab supplies the storefront and six reproducible scenarios. The companion agent skill takes that workflow to another application through a small test fixture. [Watch the checkout demo on YouTube](https://youtu.be/_Q_UA8obmvI)
+Rollback Rehearsal lets you try both orders against self-hosted Flagsmith and see what happens to the same pending payment. The lab supplies the storefront and six reproducible scenarios. The companion agent skill takes that workflow to another application through a small test fixture. [Try the live checkout demo](https://flagsmith-rollback-lab.vercel.app/presenter) · [Watch the walkthrough on YouTube](https://youtu.be/_Q_UA8obmvI)
 
 | Toggle Wars entry | Start here | What to look for |
 | --- | --- | --- |
