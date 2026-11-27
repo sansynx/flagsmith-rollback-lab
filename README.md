@@ -1,70 +1,77 @@
 # Rollback Rehearsal
 
-What happens to the shopper who already has express checkout open when you turn its flag off? Rollback Rehearsal lets you press Pay and see the result. Built for **Toggle Wars, Track 03 · Build on Open Source Flagsmith**.
+A shopper opens express checkout. You turn its feature flag off, and new shoppers go back to standard checkout. The shopper who already has a payment open still needs the express handler. When can you safely retire it?
 
-[Watch the submission video on YouTube](https://youtu.be/_Q_UA8obmvI) · [Open the hosted demo](https://flagsmith-rollback-lab.vercel.app/presenter) · [Explore the rehearsal lab](https://flagsmith-rollback-lab.vercel.app/)
+Rollback Rehearsal lets you try both orders against self-hosted Flagsmith and see what happens to the same pending payment. The lab supplies the storefront and six reproducible scenarios. The companion agent skill takes that workflow to another application through a small test fixture. [Watch the checkout demo on YouTube](https://youtu.be/_Q_UA8obmvI)
 
-Vercel serves the frontend. The hosted API reaches the self-hosted Flagsmith sandbox through a Cloudflare tunnel. The local setup below runs independently.
+| Toggle Wars entry | Start here | What to look for |
+| --- | --- | --- |
+| Track 3 · Build on Open Source Flagsmith | `make demo` | New shoppers see standard checkout in both runs. The same open order fails with immediate retirement and completes when the handler drains. |
+| Track 4 · Flagsmith Agent Skills | `make skill-demo` | The official CLI changes a flag in a disposable clone. A queued job exercises the old and new readers, and the agent gets a JSON result including cleanup. [Read the skill](skills/rehearse-flag-rollback/SKILL.md) |
 
-## Run the project
+## Run the lab
 
-Install Node.js 24, Python 3.10+, Docker with Compose v2, Make and OpenSSL. Run these commands from the repository root on Linux or macOS with Docker running.
+Use Linux or macOS with Node.js 24, Python 3.10+, Docker with Compose v2, Make and OpenSSL. From the repository root:
 
 ```sh
 make demo
-make web
 ```
 
-`make demo` starts the pinned local Flagsmith and PostgreSQL containers, provisions disposable credentials, and verifies six rollback scenarios. Each prints the original and revised HTTP outcomes and saves machine-readable evidence in `live-demo/.runtime/evidence.json`. The checkout example returns **410 Gone** followed by **201 Created**. The command exits nonzero if verification fails.
+This starts Flagsmith 2.292.0 and PostgreSQL on a local Docker network, creates six flags and exercises each workflow. Only the Flagsmith port is published, on loopback. The command verifies both the fresh visitor's assignment and the in-flight request, checks the final flag and handler state, and writes the results to `live-demo/.runtime/evidence.json`.
 
-`make web` installs the frontend dependencies, builds the dashboard and serves the site at **http://127.0.0.1:4197**. Open **/presenter**, then **Open live shop** in a second window. No sign-in is needed. All payments are synthetic.
+| In-flight request | Retire handler immediately | Let open work finish |
+| --- | --- | --- |
+| Pay for an open order | 410 | 201 |
+| Finish a resumable upload | 409 | 200 |
+| Confirm a booking hold | 409 | 201 |
+| Download a queued report | 404 | 200 |
+| Submit an onboarding draft | 422 | 200 |
+| Accept a subscription quote | 412 | 202 |
 
-1. Switch on `checkout_v2`. The paired shop changes from standard to express checkout without reloading. Start an express order.
-2. Choose **Retire express checkout immediately** and switch off. Return to the existing order and press **Pay**. New shoppers see standard checkout. The existing order fails.
-3. Return to the shop and repeat with **Let open orders finish**. Pay now produces a demo receipt. The presenter shows counts for open, paid and failed orders.
-4. Visit **/** for checkout, upload, booking, export, onboarding and pricing scenarios. Switch a scenario on and off to capture its session and replay both orders. Compare **Original plan** and **Revised plan** under **Run evidence**, then download the result under **Agent proposal**.
+These are HTTP outcomes from the synthetic application fixtures. Flagsmith supplies the real feature assignments. The planner replays the same captured session for both policies.
 
-To release the local containers when finished, run `docker compose --project-name flagsmith-rollback-lab --project-directory live-demo down`. If you set a different `COMPOSE_PROJECT_NAME`, use that project name.
+### Try the checkout yourself
 
-## Where Flagsmith fits
+Run `make web`, open [the local presenter](http://127.0.0.1:4197/presenter), and choose **Open live shop**. There is no login. All payments are synthetic.
 
-- Docker Compose runs open-source Flagsmith 2.292.0 and PostgreSQL. A Python provisioning script creates the six feature flags and the isolated environments used by the demo.
-- The Node server writes the selected feature state through the Flagsmith Management API. It reads the SDK flags endpoint to verify the assignment before exposing it to the paired shop. The credentials stay on the server. Each storefront polls its presenter's confirmed state and pins an order's assignment when checkout opens.
-- The rehearsal engine captures a synthetic in-flight session, tries the original retirement order against an HTTP fixture, then replays the same session with retirement moved after completion. It checks the actual responses, the number of pending sessions, and the final state of the flag and handler. The planner covers these six workflows. It is deterministic.
-- The included **Python targeting CLI** answers a separate release question: which saved personas would see a feature after a targeting edit? It uses the actual Flagsmith Python SDK evaluator and can run against an offline snapshot. [Python setup, examples and tests](docs/python-cli.md)
+1. Switch on `checkout_v2` and start an express order in the shop. Leave it open.
+2. In the presenter, choose **Retire express checkout immediately** and switch the flag off. Return to the open order and press **Pay**.
+3. Start another express order and repeat with **Let open orders finish**. The open order now gets a receipt while new shoppers use standard checkout.
 
-## Verify the implementation
+The Node server writes to the Flagsmith Management API and reads the SDK endpoint to verify the assignment before updating the shop. An order keeps the assignment it received when checkout opened. The React dashboard also lets you replay each scenario and inspect or download the evidence. [Local API walkthrough](live-demo/public/demo.md)
+
+## Run the agent skill
+
+Install the official Flagsmith CLI once, then run the bundled queue example against the same local stack:
+
+```sh
+npm install --global @flagsmith/cli@2.0.0
+make skill-demo
+```
+
+The example captures a versioned job, changes the Boolean flag in a cloned environment, and replays the job under two reader-retirement policies. Fresh jobs should succeed under both. Only the drain policy should deliver the original job exactly once, including a retry. The helper reports the observed violation as `verdict: "fail"`. The Make target succeeds only when it reproduces that exact comparison **and** verifies clone removal.
+
+To use the skill with your own application, give the agent an isolated fixture, the two policies and the outcomes you need to preserve. The helper checks the management and SDK assignments before replay. Missing observations or unverified cleanup produce an inconclusive result. Applying a change to a shared environment requires a separate operator decision. [Probe contract and CLI invocation](skills/rehearse-flag-rollback/references/probe.md)
+
+**Measured agent run.** On November 27, 2026, Codex CLI ran the queue rehearsal with `gpt-6.2-sol`. Both fresh-job checks passed. Only the drain policy passed the in-flight check, and cleanup was verified. The agent reported 108,625 input tokens across calls, including 80,640 cached, and 208 output tokens. Those counts include the agent harness and are from a separate run from the checkout video.
+
+The bundled skill and its tests match commit `beadb786` proposed to the official CLI repository. [Upstream Flagsmith pull request #120](https://github.com/Flagsmith/flagsmith-cli/pull/120)
+
+## Test and clean up
 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e .
 make test
-npm --prefix live-demo ci
-npm --prefix live-demo run typecheck
-npm --prefix live-demo run build
 ```
 
-For the end-to-end browser tests, keep `make web` running. In another terminal:
+`make test` runs the Python targeting, agent skill and Node fixture tests. See [AGENTS.md](AGENTS.md) for the frontend build, browser tests and source layout. The separate [Python targeting CLI](docs/python-cli.md) checks which saved personas receive a flag after a targeting change using the Flagsmith Python SDK. That tool predates the event. The rollback lab, paired shop and agent skill are this submission's contributions.
+
+Stop the local containers after the demo:
 
 ```sh
-cd live-demo
-npx playwright install chromium
-node tests/live-shop-browser.mjs
-node tests/shopper-browser.mjs
-node tests/browser.mjs
+docker compose --project-name "${COMPOSE_PROJECT_NAME:-flagsmith-rollback-lab}" --project-directory live-demo down
 ```
 
-Set `CHROME_PATH` to use an installed Chromium executable. Use `PORT` to choose another app port and `BROWSER_URL` to point the browser tests at it. The [demo guide](live-demo/public/demo.md) includes the no-login API walkthrough.
-
-## Source layout
-
-| Directory | What it contains |
-| --- | --- |
-| live-demo/server, live-demo/scripts | Flagsmith integration, Python provisioner, store sessions, rollback planner and verifier |
-| live-demo/src | React, TypeScript, shadcn/ui dashboard, presenter and shop |
-| rollout_rehearsal, examples | Python targeting CLI, offline reports and synthetic example data |
-| dashboard-ui | Source for the Python CLI's offline history dashboard |
-| tests, live-demo/tests | Python, Node and browser regression tests |
-
-The Python targeting tool predates the event. This submission brings it together with the six-scenario rollback lab and paired storefront. The [event rules](https://www.wemakedevs.org/hackathons/flagsmith/rules) allow a head start. The UI uses shadcn/ui components and credits the event artwork in the [live-demo README](live-demo/README.md).
+The [live-demo README](live-demo/README.md) credits the UI components and event artwork.
